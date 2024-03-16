@@ -29,6 +29,8 @@ id = [_a-zA-Z][a-zA-Z0-9]*      //_dsif  _varAlgo
 
 
 %%
+
+<YYINITIAL> {
             {integer}
             {
                 return token(TokenType.INTEGER, yytext());
@@ -46,6 +48,7 @@ id = [_a-zA-Z][a-zA-Z0-9]*      //_dsif  _varAlgo
 
             }
 
+}
 
 [^]
             {
