@@ -20,16 +20,20 @@ class AnalizadorActivity : AppCompatActivity() {
             Log.i("DanielApp", "El texto es: ${codeTextArea.text.toString()}" )
             var code = codeTextArea.text.toString()
             if (code.isNotEmpty()){
-                compile(code)
+                val result: Int? = compile(code)
+                if(result != null){
+                    codeTextArea.setText(result.toString())
+                }
             }
         }
 
 
     }
 
-    fun compile(input: String){
+    fun compile(input: String): Int?{
         val parser: HandleParse = HandleParse()
-        parser.parse(input)
+        val result: Int? = parser.parse(input)
+        return result
     }
 
 

@@ -1,0 +1,115 @@
+package com.daniel.EjemploJFlex;
+
+import java_cup.runtime.Symbol;
+
+class SimpleParser;
+
+parser code {:
+    public SimpleParser(SimpleLexer lexer){
+    super(lexer);
+    }
+
+    public void report_error(String message, Object info){
+
+    Symbol err = (Symbol) info;
+    Token tokenError = (Token) err.value;
+    System.out.println("Error reportado: " + message + tokenError.toString()+ this.symbl_name_from_id(tokenError.getType()));
+
+    }
+
+    public void syntax_error(Symbol cur_token){
+        System.out.println(" Se encontro un error sintactico" );
+    }
+
+    public Symbol scan() throws Exception {
+            Symbol sym = this.getScanner().next_token();
+            if(sym == null){
+                return this.getSymbolFactory().newSymbol("END_OF_FILE", this.EOF_sym());
+            }
+
+            while ( sym != null && sym.sym == SimpleParserSym.SYM){
+                this.report_expected_token_ids();
+                System.out.println("Erro lexico ignorado" + sym.value.toString());
+                sym = this.getScanner().next_token();
+            }
+
+            return sym;
+    }
+:};
+
+/*
+
+
+a -> a + b
+a -> a - b
+a -> b
+
+
+b -> b * c
+b -> b/c
+b -> c
+c -> INTEGER
+
+c -> d
+c -> -d 1*-2
+
+d-> (a)
+
+
+
+a + b
+b + b
+INTEGER + INTEGER
+
+
+1 + 2 * 3
+
+*/
+
+terminal Token PLUS, MINUS, TIMES, DIVIDES, INTEGER, LPAR, RPAR, SYM;
+non terminal Integer a, b, c, d;
+
+
+
+a ::=
+        a:n1 PLUS b:n2 {:
+        if(n1==null)
+            n1 = 0;
+        if(n2==null)
+            n2 = 0;
+        RESULT =  n1+n2;
+        :}
+        | a:n1 MINUS b:n2 {: RESULT =  n1-n2; :}
+        | b:n1 {: RESULT = n1; :}
+        ;
+
+b ::=
+        b:n1 TIMES c:n2 {: RESULT =  n1*n2; :}
+        | b:n1 DIVIDES c:n2 {:
+        if(n2 == 0){
+            throw new IllegalArgumentException("Dividiendo por cero");
+        }
+        RESULT =  n1/n2;
+        :}
+        | c:n1 {: RESULT = n1; :}
+        ;
+
+c ::= d:n1 {:RESULT = n1; :}
+    | MINUS d:n1 {: RESULT = n1 * -1; :}
+    ;
+
+d ::=
+    INTEGER:n1 {:
+    if(n1.getValue() == null)
+    RESULT = 0;
+    RESULT = Integer.valueOf(n1.getValue());
+    :}
+    | error:e INTEGER
+    {:
+
+        System.out.println("mensaje del AS" + e.toString());
+        report_error("error enviado por mi en : ", cur_err_token());
+    :}
+    ;
+
+

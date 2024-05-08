@@ -4,14 +4,12 @@ import java.io.StringReader
 
 class HandleParse {
 
-    fun parse(input: String){
+    fun parse(input: String):Int? {
         val lexer: SimpleLexer = SimpleLexer(StringReader(input))
-        var token = lexer.yylex()
+        val parser = SimpleParser(lexer)
 
-        while (token != null){
-            token.getInfo()
-            token = lexer.yylex()
-        }
+        val result: Int? = parser.parse().value as Int?
+        return result
 
     }
 
